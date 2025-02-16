@@ -1,11 +1,11 @@
 'use server'
 
-import { signIn, signOut as authSignOut } from '@/auth'
+import { signIn as authSignIn, signOut as authSignOut } from '@/auth'
 import {InvalidLoginError} from "@/utils/exceptions";
 
 export async function authenticate(username: string, password: string) {
   try {
-    const res = await signIn('credentials', {
+    const res = await authSignIn('credentials', {
       username: username,
       password: password,
       redirect: false,

@@ -2,12 +2,13 @@ import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 
 export default auth((req) => {
+    console.log("Session inside API route:", req.auth); // Debugging
     const isLoggedIn = !!req.auth;
-    const isAuthPage = req.nextUrl.pathname.startsWith("/login");
+    const isAuthPage = req.nextUrl.pathname.startsWith("/login") || req.nextUrl.pathname.startsWith("/signup");
 
     if (isAuthPage) {
         if (isLoggedIn) {
-            return NextResponse.redirect(new URL("/home", req.url));
+            return NextResponse.redirect(new URL("/", req.url));
         }
         return NextResponse.next();
     }
