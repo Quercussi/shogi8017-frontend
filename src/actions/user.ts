@@ -8,7 +8,7 @@ export const signUp =  createServerAction<void,[TUserSignUpPayload]>(
     async (data) => {
         try {
             await UserRepository.signUp(data)
-        } catch(e) {
+        } catch(e : any) {
             throw new ServerActionError(e.response.data)
         }
     }

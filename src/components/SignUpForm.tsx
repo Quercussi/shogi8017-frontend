@@ -46,7 +46,7 @@ export default function SignUpForm() {
             } else {
                 setErrorMessage(result.error || "We couldn't complete your sign-up. Please try again.");
             }
-        } catch (error) {
+        } catch {
             setErrorMessage("An unexpected error occurred. Please try again.");
         }
         setIsSubmitting(false);

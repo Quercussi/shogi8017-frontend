@@ -30,7 +30,7 @@ export default function LoginForm() {
             } else {
                 router.push("/");
             }
-        } catch (err) {
+        } catch {
             setErrorMessage("Login failed. Please try again.");
         }
         setIsSubmitting(false);

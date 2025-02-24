@@ -2,7 +2,6 @@ import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 
 export default auth((req) => {
-    console.log("Session inside API route:", req.auth); // Debugging
     const isLoggedIn = !!req.auth;
     const isAuthPage = req.nextUrl.pathname.startsWith("/login") || req.nextUrl.pathname.startsWith("/signup");
 
