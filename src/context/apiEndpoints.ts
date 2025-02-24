@@ -1,12 +1,13 @@
-const root = '/api'
+const root = '/api/v1'
 
 const apiEndpoints = {
     auth: {
-        login: `${root}/login`,
-        refresh: `${root}/refresh`,
+        login: `${root}/public/login`,
+        refresh: `${root}/token/refreshToken`,
+        websocket: `${root}/token/websocketToken`,
     },
     user: {
-        signUp: `${root}/signUp`,
+        signUp: `${root}/public/signUp`,
     }
 }
 
