@@ -57,12 +57,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
             if (token.refreshToken && shouldRefreshToken(new Date(token.accessTokenExpiry), 10)) {
                 try {
-                    const res = await fetch(apiEndpoints.auth.refresh, {
+                    const res = await fetch(`${process.env.REST_API_URL}${apiEndpoints.auth.refresh}`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
-                            Authorization: `Bearer ${token.refreshToken}`,
                         },
+                        body: JSON.stringify({
+                            refreshToken: token.refreshToken,
+                        }),
                     });
 
                     if (!res.ok) {
@@ -70,7 +72,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                         throw new Error(errorData.message || "Token refresh failed");
                     }
 
-                    const data: TTokenRefreshResponse = await res.json();
+
+                    const restJson = await res.json();
+                    const data: TTokenRefreshResponse = restJson;
 
                     return {
                         ...token,

@@ -4,7 +4,7 @@ import axios from 'axios'
 import { auth } from '@/auth'
 
 const instance = axios.create({
-  baseURL: process.env.API_URL,
+  baseURL: process.env.REST_API_URL,
 })
 
 instance.interceptors.request.use(

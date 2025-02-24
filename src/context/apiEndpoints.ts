@@ -8,7 +8,8 @@ const apiEndpoints = {
     },
     user: {
         signUp: `${root}/public/signUp`,
-    }
+        paginatedSearch: `${root}/user/search`
+    },
 }
 
 export default apiEndpoints

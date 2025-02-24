@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import type { InvitationNotificationEvent } from "@/types/ws-invitation";
 import { getWebSocketToken } from "@/actions/token";
 import { useSession } from "next-auth/react";
+import wsEndpoints from "@/context/wsEndpoints";
 
 export function useInvitationWebSocket() {
     const { data: session } = useSession();
@@ -20,12 +21,13 @@ export function useInvitationWebSocket() {
             try {
                 const result = await getWebSocketToken();
                 if (!result.success) {
+                    console.log("Failed to get WebSocket token:", result.error);
                     throw new Error(`Failed to get WebSocket token: ${result.error}`);
                 }
 
-                socket = new WebSocket(
-                    `ws://10.82.8.153:8018/api/ws/v1/invite?websocketAccessToken=${result.value.websocketAccessToken}`
-                );
+                const wsUrl = new URL(`${process.env.NEXT_PUBLIC_WS_API_URL}${wsEndpoints.invitation}`);
+                wsUrl.searchParams.append('websocketAccessToken', result.value.websocketAccessToken);
+                socket = new WebSocket(wsUrl.toString());
 
                 socket.onmessage = (msg) => {
                     try {
