@@ -47,7 +47,7 @@ export default function HomeContent() {
                 const paginatedResult = response.value;
                 setUsers(paginatedResult.users);
                 setTotalPages(Math.ceil(paginatedResult.total / userPerPage));
-            } catch (error) {
+            } catch {
                 toast.error("Failed to search users");
             } finally {
                 setIsSearching(false);
@@ -74,6 +74,7 @@ export default function HomeContent() {
             router.push(`/game/${gameCertificate}`);
             toast.success("Invitation sent successfully!");
         } catch (error) {
+        } catch {
             toast.error("Failed to send invitation");
         }
     };
