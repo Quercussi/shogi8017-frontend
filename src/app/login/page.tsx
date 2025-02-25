@@ -1,7 +1,7 @@
 // This is a server component (no "use client" here)
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import LoginForm from "@/components/LoginForm";
+import LoginForm from "@/app/login/LoginForm";
 
 export default async function LoginPage() {
     const session = await auth();

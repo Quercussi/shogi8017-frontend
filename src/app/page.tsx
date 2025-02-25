@@ -1,5 +1,5 @@
 import { SessionProvider } from "next-auth/react";
-import HomeContent from "@/components/HomePageContent";
+import HomeContent from "@/app/HomePageContent";
 import {Toaster} from "@/components/ui/sonner";
 
 export default function Home() {

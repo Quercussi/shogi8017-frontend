@@ -14,7 +14,8 @@ const eslintConfig = [
   ...compat.config({
     extends: ['next'],
     rules: {
-      "@typescript-eslint/no-explicit-any": "off"
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-empty-interface-type": "true",
     },
   }),
 ];

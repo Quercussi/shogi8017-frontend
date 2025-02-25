@@ -16,7 +16,7 @@ import { UserModel } from "@/types/user";
 export default function HomeContent() {
     const router = useRouter();
     const { data: session } = useSession();
-    const { invitations, removeInvitation } = useInvitationWebSocket();
+    const { invitations, removeInvitation, requestInvitation, createdInvitation, error } = useInvitationWebSocket();
     const [searchQuery, setSearchQuery] = useState("");
     const [users, setUsers] = useState<UserModel[]>([]);
     const [userSearchOffset, setUserSearchOffset] = useState(0);
@@ -32,6 +32,7 @@ export default function HomeContent() {
     const userPerPage = 5;
     const calculatePageNumber = (offset: number) => Math.floor(offset / userPerPage) + 1;
 
+    // WebSocket Connection
     useEffect(() => {
         const delayDebounce = setTimeout(async () => {
             try {
@@ -57,23 +58,24 @@ export default function HomeContent() {
         return () => clearTimeout(delayDebounce);
     }, [searchQuery, userSearchOffset]);
 
-    const sendInvitation = async (userId: string) => {
-        try {
-            const response = await fetch("/api/invitations", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${session?.user.accessToken}`,
-                },
-                body: JSON.stringify({ invitedUserId: userId }),
-            });
-
-            if (!response.ok) throw new Error("Invitation failed");
-
-            const { gameCertificate } = await response.json();
-            router.push(`/game/${gameCertificate}`);
+    // On Request Invitation
+    useEffect(() => {
+        if (createdInvitation) {
+            router.push(`/game/${createdInvitation.gameCertificate}`);
             toast.success("Invitation sent successfully!");
-        } catch (error) {
+        }
+    }, [createdInvitation, router]);
+
+    // On WebSocket Error
+    useEffect(() => {
+        if (error) {
+            toast.error(error);
+        }
+    }, [error]);
+
+    const sendInvitation = (userId: string) => {
+        try {
+            requestInvitation({ userId });
         } catch {
             toast.error("Failed to send invitation");
         }
@@ -127,7 +129,6 @@ export default function HomeContent() {
                     </div>
 
                     {isSearching ? (
-                        // Render a fixed number of skeletons to maintain height
                         <div className="space-y-2">
                             {Array(userPerPage)
                                 .fill(0)
