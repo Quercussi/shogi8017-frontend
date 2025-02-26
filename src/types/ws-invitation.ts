@@ -9,44 +9,33 @@ type InvitationEvent =
     | InvalidInvitationEvent;
 
 
-interface BaseWebSocketEvent<T extends string, P> {
-    type: T;
-    event: P;
-}
-
-interface BaseWebSocketRequest<T extends string, P> {
-    action: T;
-    payload: P;
-}
-
-
-interface InvitationNotificationEventPayload {
+type InvitationNotificationEventPayload = {
     gameCertificate: string;
     invitingUser: UserModel;
 }
 
-interface InvitationNotificationEvent extends BaseWebSocketEvent<'InvitationNotification', InvitationNotificationEventPayload> {}
+type InvitationNotificationEvent = BaseWebSocketEvent<'InvitationNotification', InvitationNotificationEventPayload> 
 
 
-interface InvitationInitializingEventPayload {
+type InvitationInitializingEventPayload = {
     gameCertificate: string;
 }
 
-interface InvitationInitializingEvent extends BaseWebSocketEvent<'InvitationResponse', InvitationInitializingEventPayload> {}
+type InvitationInitializingEvent = BaseWebSocketEvent<'InvitationResponse', InvitationInitializingEventPayload> 
 
 
-interface InvalidInvitationEventPayload {
+type InvalidInvitationEventPayload = {
     errorMessage: string;
 }
 
-interface InvalidInvitationEvent extends BaseWebSocketEvent<'InvalidInvitation', InvalidInvitationEventPayload> {}
+type InvalidInvitationEvent = BaseWebSocketEvent<'InvalidInvitation', InvalidInvitationEventPayload> 
 
 
-interface RegularInvitationBodyPayload {
+type RegularInvitationBodyPayload = {
     userId: string;
 }
 
-interface RegularInvitationBody extends BaseWebSocketRequest<'invite', RegularInvitationBodyPayload> {}
+type RegularInvitationBody = BaseWebSocketRequest<'invite', RegularInvitationBodyPayload> 
 
 export type {
     InvitationRequest,
