@@ -1,27 +1,34 @@
 "use client";
 
+type UseInvitationWebSocketProps = {
+    requestAction: {
+        requestInvitation: (payload: RegularInvitationBodyPayload) => void,
+    },
+    events: {
+        createdInvitation: InvitationInitializingEventPayload | null,
+        invitation: InvitationNotificationEventPayload | null,
+        error: string | null,
+    }
+}
+
 import { useState, useEffect, useRef } from "react";
 import {
-    InvitationEvent,
-    InvitationNotificationEvent, InvitationNotificationEventPayload,
-    InvitationRequest,
-    RegularInvitationBody, RegularInvitationBodyPayload
+    InvitationEvent, InvitationInitializingEventPayload,
+    InvitationNotificationEventPayload,
+    RegularInvitationBody,
+    RegularInvitationBodyPayload
 } from "@/types/ws-invitation";
 import { getWebSocketToken } from "@/actions/token";
 import { useSession } from "next-auth/react";
 import wsEndpoints from "@/context/wsEndpoints";
 
-type WsMessage = {
-    type: "InvitationNotification" | "InvitationResponse" | "InvalidInvitation";
-    event?: any;
-    message?: string;
-};
-
-export function useInvitationWebSocket() {
+export function useInvitationWebSocket(): UseInvitationWebSocketProps {
     const { data: session } = useSession();
-    const [invitations, setInvitations] = useState<InvitationNotificationEventPayload[]>([]);
-    const [createdInvitation, setCreatedInvitation] = useState<{ gameCertificate: string } | null>(null);
+
+    const [invitation, setInvitation] = useState<InvitationNotificationEventPayload | null>(null);
+    const [createdInvitation, setCreatedInvitation] = useState<InvitationInitializingEventPayload | null>(null);
     const [error, setError] = useState<string | null>(null);
+
     const wsRef = useRef<WebSocket | null>(null);
     const [retryCount, setRetryCount] = useState(0);
 
@@ -48,9 +55,9 @@ export function useInvitationWebSocket() {
                         const data: InvitationEvent = JSON.parse(msg.data);
                         switch (data.type) {
                             case "InvitationNotification":
-                                setInvitations(prev => [...prev, data.event]);
+                                setInvitation(data.event);
                                 break;
-                            case "InvitationResponse": // TODO: change this
+                            case "InvitationResponse":
                                 setCreatedInvitation(data.event);
                                 break;
                             case "InvalidInvitation":
@@ -102,11 +109,14 @@ export function useInvitationWebSocket() {
         }
     };
 
-    const removeInvitation = (gameCertificate: string) => {
-        setInvitations(prev =>
-            prev.filter(inv => inv.gameCertificate !== gameCertificate)
-        );
+    return {
+        requestAction: {
+            requestInvitation,
+        },
+        events: {
+            createdInvitation,
+            invitation,
+            error,
+        },
     };
-
-    return { invitations, removeInvitation, requestInvitation, createdInvitation, error };
 }

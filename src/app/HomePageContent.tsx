@@ -16,7 +16,7 @@ import { UserModel } from "@/types/user";
 export default function HomeContent() {
     const router = useRouter();
     const { data: session } = useSession();
-    const { invitations, removeInvitation, requestInvitation, createdInvitation, error } = useInvitationWebSocket();
+    const {events: {invitation, createdInvitation, error}, requestAction: {requestInvitation}} = useInvitationWebSocket();
     const [searchQuery, setSearchQuery] = useState("");
     const [users, setUsers] = useState<UserModel[]>([]);
     const [userSearchOffset, setUserSearchOffset] = useState(0);
@@ -25,7 +25,6 @@ export default function HomeContent() {
 
     const handleJoinGame = (gameCertificate: string) => {
         console.log("Joining game with certificate:", gameCertificate);
-        removeInvitation(gameCertificate);
         router.push(`/game/${gameCertificate}`);
     };
 
@@ -82,36 +81,37 @@ export default function HomeContent() {
     };
 
     useEffect(() => {
-        invitations.forEach(invitation => {
-            toast.custom((t) => (
-                <div className="flex flex-col gap-2 p-4 bg-background border rounded-lg shadow-lg">
-                    <div className="font-semibold">Game Invitation</div>
-                    <div>{invitation.invitingUser.username} invited you to a game!</div>
-                    <div className="flex gap-2 mt-2">
-                        <Button
-                            size="sm"
-                            onClick={() => {
-                                handleJoinGame(invitation.gameCertificate);
-                                toast.dismiss(t);
-                            }}
-                        >
-                            Join Now
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                                removeInvitation(invitation.gameCertificate);
-                                toast.dismiss(t);
-                            }}
-                        >
-                            Dismiss
-                        </Button>
-                    </div>
+        if (!invitation) {
+            return
+        }
+
+        toast.custom((t) => (
+            <div className="flex flex-col gap-2 p-4 bg-background border rounded-lg shadow-lg">
+                <div className="font-semibold">Game Invitation</div>
+                <div>{invitation.invitingUser.username} invited you to a game!</div>
+                <div className="flex gap-2 mt-2">
+                    <Button
+                        size="sm"
+                        onClick={() => {
+                            handleJoinGame(invitation.gameCertificate);
+                            toast.dismiss(t);
+                        }}
+                    >
+                        Join Now
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                            toast.dismiss(t);
+                        }}
+                    >
+                        Dismiss
+                    </Button>
                 </div>
-            ), { duration: Infinity });
-        });
-    }, [invitations]);
+            </div>
+        ), { duration: Infinity });
+    }, [invitation]);
 
     return (
         <div className="min-h-screen flex items-center justify-center gap-8">
