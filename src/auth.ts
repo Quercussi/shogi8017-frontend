@@ -1,8 +1,8 @@
-import { AuthRepository } from '@/repository/auth';
+import {AuthRepository} from '@/repository/auth';
 import Credentials from 'next-auth/providers/credentials';
-import { shouldRefreshToken } from '@/utils/helpers';
+import {shouldRefreshToken} from '@/utils/helpers';
 import apiEndpoints from '@/context/apiEndpoints';
-import { TTokenRefreshResponse } from '@/types/auth';
+import {TTokenRefreshResponse} from '@/types/auth';
 import NextAuth, {Session, User} from "next-auth";
 import {JWT} from "next-auth/jwt"
 
@@ -24,7 +24,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
                     return {
                         id: username,
-                        username: username,
+                        userInfo: response.user,
                         accessToken: response.accessToken,
                         accessTokenExpiry: response.accessTokenExpiry,
                         refreshToken: response.refreshToken,
@@ -73,11 +73,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     }
 
 
-                    const restJson = await res.json();
-                    const data: TTokenRefreshResponse = restJson;
+                    const data: TTokenRefreshResponse = await res.json();
 
                     return {
                         ...token,
+                        userInfo: data.user,
                         accessToken: data.accessToken,
                         accessTokenExpiry: data.accessTokenExpiry,
                         refreshToken: data.refreshToken,
@@ -98,7 +98,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         async session({ session, token }: { session: Session, token: JWT }) {
             session.user = {
-                username: token.username,
+                userInfo: token.userInfo,
                 accessToken: token.accessToken,
                 accessTokenExpiry: token.accessTokenExpiry,
                 refreshToken: token.refreshToken,

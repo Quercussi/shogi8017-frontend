@@ -1,26 +1,19 @@
+import {UserModel} from "@/types/user";
+
 export type TUserLoginPayload = {
     username: string,
     password: string
 }
 
-export type TUser = {
-    username: string
+export type TUserLoginResponse =  {
+    user: UserModel;
     accessToken: string;
     refreshToken: string;
     accessTokenExpiry: number;
     refreshTokenExpiry: number;
-}
-
-export type TUserLoginResponse = TTokenRefreshResponse & {
-    username: string;
 };
 
-export type TTokenRefreshResponse = {
-    accessToken: string;
-    refreshToken: string;
-    accessTokenExpiry: number;
-    refreshTokenExpiry: number;
-}
+export type TTokenRefreshResponse = TUserLoginResponse
 
 export type TErrorResponse = {
     message: string;

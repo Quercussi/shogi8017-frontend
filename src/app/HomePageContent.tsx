@@ -191,7 +191,7 @@ export default function HomeContent() {
             <Card className="w-full max-w-md">
                 <CardHeader>
                     <CardTitle>
-                        Welcome {session?.user?.username || "Guest"}
+                        Welcome {session?.user?.userInfo.username || "Guest"}
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
