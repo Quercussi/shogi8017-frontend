@@ -60,6 +60,7 @@ export default function HomeContent() {
     // On Request Invitation
     useEffect(() => {
         if (createdInvitation) {
+            console.log(`Redirecting to : /game/${createdInvitation.gameCertificate}`);
             router.push(`/game/${createdInvitation.gameCertificate}`);
             toast.success("Invitation sent successfully!");
         }

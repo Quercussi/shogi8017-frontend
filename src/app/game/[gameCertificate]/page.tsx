@@ -1,9 +1,13 @@
-import GameContent from "@/app/game/[gameCertificate]/GameContent";
+import {SessionProvider} from "next-auth/react";
+import {GameProvider} from "@/hooks/useGameWebSocket";
+import GamePageClient from "@/app/game/[gameCertificate]/pageClient";
 
 export default function GamePage() {
     return (
-        <div className="min-h-screen flex items-center justify-center">
-            <GameContent/>
-        </div>
+        <SessionProvider>
+            <GameProvider>
+                <GamePageClient />
+            </GameProvider>
+        </SessionProvider>
     );
 }
