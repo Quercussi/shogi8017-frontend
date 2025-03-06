@@ -4,8 +4,8 @@ import {useRef} from 'react'
 import {useDrop} from 'react-dnd'
 import {GamePiece, Position} from '@/types/game'
 import {useGameContext} from '@/hooks/useGameWebSocket'
-import DraggablePiece from './DraggablePiece'
 import {DragItem, DragItemType} from "@/app/game/[gameCertificate]/utils/drags";
+import {BoardPiece} from "@/components/BoardPiece";
 
 const BoardSquare = ({ position, piece }: { position: Position, piece: GamePiece | null}) => {
     const { requestAction } = useGameContext()
@@ -42,7 +42,7 @@ const BoardSquare = ({ position, piece }: { position: Position, piece: GamePiece
             ref={squareRef}
             className="w-16 h-16 bg-amber-100 flex items-center justify-center"
         >
-            {piece && <DraggablePiece position={position} piece={piece} />}
+            {piece && <BoardPiece position={position} piece={piece} />}
         </div>
     )
 }

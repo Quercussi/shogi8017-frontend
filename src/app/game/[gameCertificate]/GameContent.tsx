@@ -14,10 +14,10 @@ import {
     Position
 } from "@/types/game";
 import {useGameContext} from "@/hooks/useGameWebSocket";
-import {isPromotedPiece, opponentPlayer} from "@/app/game/[gameCertificate]/utils/calculations";
-import HandPiece from "@/components/HandPiece";
+import {opponentPlayer} from "@/app/game/[gameCertificate]/utils/calculations";
 import GameBoardComponent from "@/components/GameBoardComponent";
 import GameOverOverlay from "@/components/GameOverOverlay";
+import {HandPiece} from "@/components/HandPiece";
 
 const initialBoard: GameBoard = Array(9).fill(null).map(() => Array(9).fill(null))
 
