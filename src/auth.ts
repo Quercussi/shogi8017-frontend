@@ -5,6 +5,7 @@ import apiEndpoints from '@/context/apiEndpoints';
 import {TTokenRefreshResponse} from '@/types/auth';
 import NextAuth, {Session, User} from "next-auth";
 import {JWT} from "next-auth/jwt"
+import {redirect} from "next/navigation";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
     providers: [
@@ -85,11 +86,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     };
 
                 } catch (error) {
-                    let errorMessage = "Token refresh failed";
-                    if (error instanceof Error) {
-                        errorMessage = error.message;
-                    }
-                    return { ...token, error: errorMessage };
+                    await signOut()
+                    redirect('/')
                 }
             }
 
