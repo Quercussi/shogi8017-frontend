@@ -26,7 +26,7 @@ const BoardSquare = ({ position, piece }: { position: Position, piece: GamePiece
                 requestAction.makeDrop({
                     drop: {
                         position,
-                        piece: item.pieceType
+                        pieceType: item.pieceType
                     }
                 })
             } else {

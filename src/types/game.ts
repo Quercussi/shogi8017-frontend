@@ -23,7 +23,7 @@ type MoveAction = {
 
 type DropAction = {
     position: Position,
-    piece: PieceType
+    pieceType: PieceType
 }
 
 type PieceType = PromotablePieceType | PromotedPieceType | UnPromotablePieceType
