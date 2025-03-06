@@ -70,7 +70,6 @@ export default function GameContent() {
             newBoard[row][col] = {
                 type: piece,
                 owner: player === userColor ? Owner.PLAYER : Owner.OPPONENT,
-                promoted: isPromotedPiece(piece)
             }
         })
 
@@ -118,13 +117,41 @@ export default function GameContent() {
                         newBoard[row][col] = {
                             type: transition.piece,
                             owner: transition.player === prev.userColor ? Owner.PLAYER : Owner.OPPONENT,
-                            promoted: transition.piece.startsWith('P_')
                         }
                         return { ...prev, board: newBoard }
                     })
                     break
 
-                // Add similar cases for HAND_ADD/REMOVE
+                case BoardActionEnumerators.HAND_ADD:
+                    setGameState(prev => {
+                        const player = transition.player === prev.userColor ? Owner.PLAYER : Owner.OPPONENT
+                        const newPiece = {
+                            type: transition.piece,
+                            owner: player,
+                        }
+
+                        return player === Owner.PLAYER ?
+                            { ...prev, playerHand: [...prev.playerHand, newPiece] } :
+                            { ...prev, opponentHand: [...prev.opponentHand, newPiece] }
+                    })
+                    break
+
+                case BoardActionEnumerators.HAND_REMOVE:
+                    setGameState(prev => {
+                        const player = transition.player === prev.userColor ? Owner.PLAYER : Owner.OPPONENT
+                        const hand = player === Owner.PLAYER ? prev.playerHand : prev.opponentHand
+
+                        // Find first matching piece to remove
+                        const index = hand.findIndex(p => p.type === transition.piece)
+                        if (index === -1) return prev // No match found
+
+                        const newHand = [...hand.slice(0, index), ...hand.slice(index + 1)]
+
+                        return player === Owner.PLAYER
+                            ? { ...prev, playerHand: newHand }
+                            : { ...prev, opponentHand: newHand }
+                    })
+                    break
             }
         }
 

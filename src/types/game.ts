@@ -69,7 +69,6 @@ enum GameWinner {
 type GamePiece = {
     type: PieceType
     owner: Owner
-    promoted: boolean
 }
 
 enum Owner {
