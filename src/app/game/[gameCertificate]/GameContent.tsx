@@ -1,14 +1,23 @@
 "use client"
 
 import React, {useCallback, useEffect, useState} from 'react'
-import {useParams} from "next/navigation"
+import {useParams, useRouter} from "next/navigation"
 import {useSession} from 'next-auth/react'
 import {StateTransition} from "@/types/ws-game";
-import {BoardActionEnumerators, GameBoard, GameState, Owner, Player, Position} from "@/types/game";
+import {
+    BoardActionEnumerators,
+    GameBoard,
+    GameEventWinnerPairDeterminated,
+    GameState,
+    Owner,
+    Player,
+    Position
+} from "@/types/game";
 import {useGameContext} from "@/hooks/useGameWebSocket";
 import {isPromotedPiece, opponentPlayer} from "@/app/game/[gameCertificate]/utils/calculations";
 import HandPiece from "@/components/HandPiece";
 import GameBoardComponent from "@/components/GameBoardComponent";
+import GameOverOverlay from "@/components/GameOverOverlay";
 
 const initialBoard: GameBoard = Array(9).fill(null).map(() => Array(9).fill(null))
 
@@ -24,8 +33,11 @@ export default function GameContent() {
         selectedPosition: null,
         selectedHandPiece: null
     })
+    const [gameOutcome, setGameOutcome] = useState<GameEventWinnerPairDeterminated | null>(null)
 
     const { requestAction, events, setGameCertificate } = useGameContext()
+
+    const router = useRouter()
 
     useEffect(() => {
         if (Array.isArray(gameCertificate)) {
@@ -126,8 +138,11 @@ export default function GameContent() {
                 : Player.WHITE_PLAYER
         }))
 
-        if(gameEvent.gameEvent) {
-            // TODO: show if game ends
+        if (gameEvent.winner) {
+            setGameOutcome({
+                gameEvent: gameEvent.gameEvent,
+                winner: gameEvent.winner
+            })
         }
     }, [events.action])
 
@@ -143,6 +158,13 @@ export default function GameContent() {
 
     return (
         <div className="min-h-screen flex items-center justify-center">
+            {gameOutcome && (
+                <GameOverOverlay
+                    outcome={gameOutcome}
+                    onReturnHome={() => router.push("/")}
+                />
+            )}
+
             <div className="flex flex-col items-center p-4 gap-4">
                 {/* Game Controls */}
                 <div className="w-full max-w-2xl flex justify-between items-center">

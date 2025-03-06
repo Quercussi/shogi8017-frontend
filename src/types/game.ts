@@ -91,11 +91,17 @@ type GameState = {
     selectedHandPiece: PieceType | null
 }
 
+type GameEventWinnerPairDeterminated = {
+    gameEvent?: GameEvent,
+    winner: GameWinner
+}
+
 export type {
     Position,
     MoveAction,
     DropAction,
     PieceType,
+    GameEventWinnerPairDeterminated,
 
     GamePiece,
     GameBoard,

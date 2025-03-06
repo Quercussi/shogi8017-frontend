@@ -1,5 +1,14 @@
 import {UserModel} from "@/types/user";
-import {BoardActionEnumerators, DropAction, GameEvent, MoveAction, PieceType, Player, Position} from "@/types/game";
+import {
+    BoardActionEnumerators,
+    DropAction,
+    GameEvent,
+    GameWinner,
+    MoveAction,
+    PieceType,
+    Player,
+    Position
+} from "@/types/game";
 
 
 type GameActionRequest =
@@ -55,7 +64,7 @@ type StateTransition = {
 
 type GameEventWinnerPair = {
     gameEvent?: GameEvent,
-    winner?: Player
+    winner?: GameWinner
 }
 
 
