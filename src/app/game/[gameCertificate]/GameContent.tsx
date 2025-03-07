@@ -50,7 +50,7 @@ export default function GameContent() {
     // Convert server position to board indices
     const toBoardIndices = useCallback((position: Position) => ({
         row: 9 - position.y,
-        col: position.x - 1
+        col: 9 - position.x
     }), [])
 
     // Handle board configuration updates
