@@ -26,7 +26,7 @@ export const BoardPiece = ({ piece, position }: BoardPieceProps) => {
             isDragging: monitor.isDragging(),
             canDrag: monitor.canDrag(),
         })
-    }))
+    }), [piece])
 
     drag(pieceRef)
 

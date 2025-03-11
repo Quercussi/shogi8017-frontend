@@ -1,27 +1,37 @@
-"use client"
+"use client";
 
-import {useRef} from 'react'
-import {useDrop} from 'react-dnd'
-import {GamePiece, Position} from '@/types/game'
-import {useGameContext} from '@/hooks/useGameWebSocket'
-import {DragItem, DragItemType} from "@/app/game/[gameCertificate]/utils/drags";
-import {BoardPiece} from "@/components/BoardPiece";
+import { useRef } from 'react';
+import { useDrop } from 'react-dnd';
+import { GamePiece, Position } from '@/types/game';
+import { useGameContext } from '@/hooks/useGameWebSocket';
+import { DragItem, DragItemType } from "@/app/game/[gameCertificate]/utils/drags";
+import { BoardPiece } from "@/components/BoardPiece";
+import { toast } from "sonner";
+import PromotionToast from "@/components/PromotionToast"; // Adjust the path as needed
 
-const BoardSquare = ({ position, piece }: { position: Position, piece: GamePiece | null}) => {
-    const { requestAction } = useGameContext()
-    const squareRef = useRef<HTMLDivElement>(null)
+const BoardSquare = ({ position, piece }: { position: Position, piece: GamePiece | null }) => {
+    const { requestAction } = useGameContext();
+    const squareRef = useRef<HTMLDivElement>(null);
 
     const [, drop] = useDrop(() => ({
         accept: [DragItemType.BOARD_PIECE, DragItemType.HAND_PIECE],
         drop: (item: DragItem) => {
+            toast.dismiss();
+
             if (item.type === DragItemType.BOARD_PIECE && item.position) {
-                requestAction.makeMove({
-                    move: {
-                        from: item.position,
-                        to: position,
-                        toPromote: confirm('Promote this piece?')
-                    }
-                })
+                const from = item.position;
+                const to = position;
+
+                toast.custom(
+                    (t) => (
+                        <PromotionToast
+                            move={{ from, to }}
+                            makeMove={requestAction.makeMove}
+                            dismissToast={() => toast.dismiss(t)}
+                        />
+                    ),
+                    { duration: Infinity }
+                );
             } else if (item.type === DragItemType.HAND_PIECE && item.pieceType) {
                 requestAction.makeDrop({
                     drop: {
@@ -33,7 +43,7 @@ const BoardSquare = ({ position, piece }: { position: Position, piece: GamePiece
                 console.error("Invalid drop")
             }
         }
-    }))
+    }), [position, requestAction]);
 
     drop(squareRef)
 
