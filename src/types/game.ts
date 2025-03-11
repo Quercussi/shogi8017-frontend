@@ -72,8 +72,8 @@ type GamePiece = {
 }
 
 enum Owner {
-    PLAYER = 'player',
-    OPPONENT = 'opponent'
+    PLAYER = 'PLAYER',
+    OPPONENT = 'OPPONENT'
 }
 
 type GameBoard = (GamePiece | null)[][]
