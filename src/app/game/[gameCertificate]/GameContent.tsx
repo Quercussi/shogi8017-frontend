@@ -8,7 +8,7 @@ import {
     BoardActionEnumerators,
     GameBoard,
     GameEventWinnerPairDeterminated,
-    GameState,
+    GameConfiguration,
     Owner,
     Player,
     Position,
@@ -24,7 +24,7 @@ const initialBoard: GameBoard = Array(9).fill(null).map(() => Array(9).fill(null
 export default function GameContent() {
     const { gameCertificate } = useParams();
     const { data: session } = useSession();
-    const [gameState, setGameState] = useState<GameState>({
+    const [gameState, setGameState] = useState<GameConfiguration>({
         board: initialBoard,
         playerHand: [],
         opponentHand: [],

@@ -4,7 +4,7 @@ import {
     TUserPaginatedSearchResponse,
     TUserPaginatedSearchPayload,
     TUserSignUpPayload,
-    TUserSignUpResponse
+    TUserSignUpResponse, MaybeUserModel, TUserGetByIdPayload
 } from "@/types/user";
 export class UserRepository {
     static async signUp(signUpPayload: TUserSignUpPayload): Promise<TUserSignUpResponse> {
@@ -20,6 +20,11 @@ export class UserRepository {
                 limit: searchPayload.limit,
             }
         });
+        return data;
+    }
+
+    static async getById(payload: TUserGetByIdPayload): Promise<MaybeUserModel> {
+        const { data } = await axios.get<MaybeUserModel>(`${apiEndpoints.user.getById}/${payload.userId}`);
         return data;
     }
 }

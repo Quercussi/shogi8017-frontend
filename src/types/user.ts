@@ -20,15 +20,23 @@ type TUserPaginatedSearchResponse = {
     total: number,
 }
 
+type TUserGetByIdPayload = {
+    userId: string;
+}
+
 type UserModel = {
     userId: string;
     username: string;
 }
 
+type MaybeUserModel = UserModel | null;
+
 export type {
     TUserSignUpPayload,
     TUserSignUpResponse,
+    TUserGetByIdPayload,
     TUserPaginatedSearchPayload,
     TUserPaginatedSearchResponse,
-    UserModel
+    UserModel,
+    MaybeUserModel
 }

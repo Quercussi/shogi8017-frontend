@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
 import { paginatedSearch } from "@/actions/user";
 import { UserModel } from "@/types/user";
+import GamesCard from "@/components/GamesCard";
 
 export default function HomeContent() {
     const router = useRouter();
@@ -115,90 +116,92 @@ export default function HomeContent() {
     }, [invitation]);
 
     return (
-        <div className="min-h-screen flex items-center justify-center gap-8">
-            <Card className="w-full max-w-md">
-                <CardHeader>
-                    <CardTitle>Start a New Game</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                        <Input
-                            placeholder="Search players..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
-                    </div>
+        <div className="flex flex-col min-h-screen">
+            {/* Header with user info and sign out button */}
+            <div className="w-full p-4 flex justify-between items-center border-b">
+                <div className="font-medium">
+                    Welcome, {session?.user?.userInfo.username || "Guest"}
+                </div>
+                <SignOutButton />
+            </div>
 
-                    {isSearching ? (
+            {/* Main content */}
+            <div className="flex-1 flex items-center justify-center gap-8 p-6">
+                <Card className="w-full max-w-md">
+                    <CardHeader>
+                        <CardTitle>Start a New Game</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
                         <div className="space-y-2">
-                            {Array(userPerPage)
-                                .fill(0)
-                                .map((_, i) => (
-                                    <Skeleton key={i} className="w-full h-16" />
-                                ))}
+                            <Input
+                                placeholder="Search players..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
                         </div>
-                    ) : (
-                        <div className="space-y-2">
-                            {users.map((user) => (
-                                <div key={user.userId} className="flex items-center justify-between p-2 border rounded h-16">
-                                    <div>
-                                        <div className="font-medium">{user.username}</div>
-                                        <div className="text-sm text-muted-foreground">
-                                            Username: {user.username}
-                                        </div>
-                                    </div>
-                                    <Button
-                                        size="sm"
-                                        onClick={() => sendInvitation(user.userId)}
-                                    >
-                                        Invite
-                                    </Button>
-                                </div>
-                            ))}
-                            {users.length < userPerPage &&
-                                Array(userPerPage - users.length)
+
+                        {isSearching ? (
+                            <div className="space-y-2">
+                                {Array(userPerPage)
                                     .fill(0)
                                     .map((_, i) => (
-                                        <div
-                                            key={`empty-${i}`}
-                                            className="h-16 w-full rounded"
-                                        />
+                                        <Skeleton key={i} className="w-full h-16" />
                                     ))}
-                        </div>
-                    )}
+                            </div>
+                        ) : (
+                            <div className="space-y-2">
+                                {users.map((user) => (
+                                    <div key={user.userId} className="flex items-center justify-between p-2 border rounded h-16">
+                                        <div>
+                                            <div className="font-medium">{user.username}</div>
+                                            <div className="text-sm text-muted-foreground">
+                                                Username: {user.username}
+                                            </div>
+                                        </div>
+                                        <Button
+                                            size="sm"
+                                            onClick={() => sendInvitation(user.userId)}
+                                        >
+                                            Invite
+                                        </Button>
+                                    </div>
+                                ))}
+                                {users.length < userPerPage &&
+                                    Array(userPerPage - users.length)
+                                        .fill(0)
+                                        .map((_, i) => (
+                                            <div
+                                                key={`empty-${i}`}
+                                                className="h-16 w-full rounded"
+                                            />
+                                        ))}
+                            </div>
+                        )}
 
-                    <div className="flex justify-between items-center">
-                        <Button
-                            variant="outline"
-                            disabled={userSearchOffset === 0}
-                            onClick={() => setUserSearchOffset(prev => Math.max(0, prev - userPerPage))}
-                        >
-                            Previous
-                        </Button>
-                        <div className="text-sm">
-                            Page {calculatePageNumber(userSearchOffset)} of {totalPages}
+                        <div className="flex justify-between items-center">
+                            <Button
+                                variant="outline"
+                                disabled={userSearchOffset === 0}
+                                onClick={() => setUserSearchOffset(prev => Math.max(0, prev - userPerPage))}
+                            >
+                                Previous
+                            </Button>
+                            <div className="text-sm">
+                                Page {calculatePageNumber(userSearchOffset)} of {totalPages}
+                            </div>
+                            <Button
+                                variant="outline"
+                                disabled={calculatePageNumber(userSearchOffset) >= totalPages}
+                                onClick={() => setUserSearchOffset(prev => prev + userPerPage)}
+                            >
+                                Next
+                            </Button>
                         </div>
-                        <Button
-                            variant="outline"
-                            disabled={calculatePageNumber(userSearchOffset) >= totalPages}
-                            onClick={() => setUserSearchOffset(prev => prev + userPerPage)}
-                        >
-                            Next
-                        </Button>
-                    </div>
-                </CardContent>
-            </Card>
+                    </CardContent>
+                </Card>
 
-            <Card className="w-full max-w-md">
-                <CardHeader>
-                    <CardTitle>
-                        Welcome {session?.user?.userInfo.username || "Guest"}
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <SignOutButton />
-                </CardContent>
-            </Card>
+                <GamesCard/>
+            </div>
         </div>
     );
 }

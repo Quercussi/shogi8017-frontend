@@ -1,3 +1,26 @@
+type TGamePaginatedGetPayload = {
+    offset?: number
+    limit?: number
+}
+
+type TGamePaginatedGetResponse = {
+    games: GameModel[],
+    count: number,
+    nextOffset: number,
+    total: number
+}
+
+type GameModel = {
+    gameId: String,
+    gameCertificate: String,
+    boardId: String,
+    whiteUserId: String,
+    blackUserId: String,
+    winner?: GameWinner,
+    gameState: GameState,
+    createdAt: number,
+}
+
 type Position = {
     x: number;
     y: number;
@@ -65,6 +88,12 @@ enum GameWinner {
     DRAW = 'DRAW'
 }
 
+enum GameState {
+    PENDING = 'PENDING',
+    ON_GOING = 'ON_GOING',
+    FINISHED = 'FINISHED'
+}
+
 
 type GamePiece = {
     type: PieceType
@@ -80,7 +109,7 @@ type GameBoard = (GamePiece | null)[][]
 
 type GameHand = GamePiece[]
 
-type GameState = {
+type GameConfiguration = {
     board: GameBoard
     playerHand: GameHand
     opponentHand: GameHand
@@ -96,6 +125,10 @@ type GameEventWinnerPairDeterminated = {
 }
 
 export type {
+    TGamePaginatedGetPayload,
+    TGamePaginatedGetResponse,
+
+    GameModel,
     Position,
     MoveAction,
     DropAction,
@@ -105,10 +138,11 @@ export type {
     GamePiece,
     GameBoard,
     GameHand,
-    GameState
+    GameConfiguration
 }
 
 export {
+    GameState,
     BoardActionEnumerators,
     Player,
     PromotablePieceType,

@@ -8,8 +8,12 @@ const apiEndpoints = {
     },
     user: {
         signUp: `${root}/public/signUp`,
-        paginatedSearch: `${root}/user/search`
+        paginatedSearch: `${root}/user/search`,
+        getById: `${root}/user`,
     },
+    game: {
+        paginatedGet: `${root}/game`
+    }
 }
 
 export default apiEndpoints
