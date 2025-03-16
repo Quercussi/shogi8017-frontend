@@ -34,6 +34,7 @@ const GameBoardComponent = ({ board, userColor }: GameBoardProps) => {
 
         if (userColor === Player.WHITE_PLAYER) {
             baseSquares.reverse()
+        } else {
             baseSquares.forEach(row => row.reverse())
         }
 
