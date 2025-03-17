@@ -19,7 +19,8 @@ export const BoardPiece = ({ piece, position }: BoardPieceProps) => {
         item: {
             type: DragItemType.BOARD_PIECE,
             pieceType: piece.type,
-            position
+            position: position,
+            owner: piece.ownerPlayer,
         } as DragItemBoard,
         canDrag: piece.owner === Owner.PLAYER,
         collect: (monitor) => ({

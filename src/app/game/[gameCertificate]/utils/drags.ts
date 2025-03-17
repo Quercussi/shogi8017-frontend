@@ -1,4 +1,4 @@
-import {PieceType, Position} from "@/types/game";
+import {PieceType, Player, Position} from "@/types/game";
 
 type DragItem =
     | DragItemHand
@@ -12,7 +12,8 @@ type DragItemHand = {
 type DragItemBoard = {
     type: DragItemType.BOARD_PIECE,
     position: Position,
-    pieceType: PieceType
+    pieceType: PieceType,
+    owner: Player
 }
 
 enum DragItemType {

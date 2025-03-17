@@ -98,6 +98,7 @@ enum GameState {
 type GamePiece = {
     type: PieceType
     owner: Owner
+    ownerPlayer: Player
 }
 
 enum Owner {
