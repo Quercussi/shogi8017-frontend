@@ -42,7 +42,6 @@ export default function GamesCard() {
                 setGames(paginatedResult.games);
                 setTotalGamePages(Math.ceil(paginatedResult.total / gamesPerPage));
 
-                // Prefetch users for the games
                 paginatedResult.games.forEach(game => {
                     fetchUserIfNeeded(game.whiteUserId.toString());
                     fetchUserIfNeeded(game.blackUserId.toString());
@@ -73,6 +72,10 @@ export default function GamesCard() {
             console.error("Failed to fetch user", userId);
         }
     };
+
+    const handleViewGame = (gameCertificate: string) => {
+        router.push(`/game/${gameCertificate}/view`);
+    }
 
     const handleJoinGame = (gameCertificate: string) => {
         router.push(`/game/${gameCertificate}`);
@@ -121,6 +124,24 @@ export default function GamesCard() {
             <Badge variant="destructive">Loss</Badge>;
     };
 
+    const getGameInteractionButton = (game: GameModel) => {
+        const text = game.gameState === GameState.FINISHED ? "View" : "Resume";
+        const buttonVariant = game.gameState === GameState.FINISHED ? "outline" : "default"
+
+        const gameCertificateStr = game.gameCertificate.toString();
+        const onClickFunction = game.gameState === GameState.FINISHED ?
+            () => handleViewGame(gameCertificateStr) :
+            () => handleJoinGame(gameCertificateStr);
+
+        return <Button
+            size="sm"
+            onClick={onClickFunction}
+            variant={buttonVariant}
+        >
+            {text}
+        </Button>
+    }
+
     const formatGameTitle = (game: GameModel) => {
         const whiteUser = userCache[game.whiteUserId.toString()];
         const blackUser = userCache[game.blackUserId.toString()];
@@ -159,12 +180,7 @@ export default function GamesCard() {
                                         {getOutcomeBadge(game)}
                                     </div>
                                 </div>
-                                <Button
-                                    size="sm"
-                                    onClick={() => handleJoinGame(game.gameCertificate.toString())}
-                                >
-                                    Resume
-                                </Button>
+                                {getGameInteractionButton(game)}
                             </div>
                         ))}
                         {games.length < gamesPerPage &&
