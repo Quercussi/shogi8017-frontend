@@ -9,7 +9,7 @@ const apiEndpoints = {
     user: {
         signUp: `${root}/public/signUp`,
         paginatedSearch: `${root}/user/search`,
-        getById: `${root}/user`,
+        getById: (userId: string) => `${root}/user/${userId}`,
     },
     game: {
         paginatedGet: `${root}/game`
