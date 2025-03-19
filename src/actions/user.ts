@@ -2,13 +2,13 @@
 
 import {UserRepository} from "@/repository/user";
 import {
-    MaybeUserModel,
     TUserGetByIdPayload,
     TUserPaginatedSearchPayload,
     TUserPaginatedSearchResponse,
-    TUserSignUpPayload
+    TUserSignUpPayload, UserModel
 } from "@/types/user";
 import {createServerAction, ServerActionError} from "@/utils/action";
+import {Maybe} from "@/types/type-constructor";
 
 export const signUp =  createServerAction<void,[TUserSignUpPayload]>(
     async (data) => {
@@ -30,7 +30,7 @@ export const paginatedSearch = createServerAction<TUserPaginatedSearchResponse, 
     }
 )
 
-export const getById = createServerAction<MaybeUserModel, [TUserGetByIdPayload]>(
+export const getById = createServerAction<Maybe<UserModel>, [TUserGetByIdPayload]>(
     async (data) => {
         try {
             return await UserRepository.getById(data)

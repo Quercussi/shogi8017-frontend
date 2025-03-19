@@ -1,3 +1,6 @@
+import {UserModel} from "@/types/user";
+import {Maybe} from "@/types/type-constructor";
+
 type TGamePaginatedGetPayload = {
     offset?: number
     limit?: number
@@ -115,7 +118,7 @@ type GameConfiguration = {
     playerHand: GameHand
     opponentHand: GameHand
     currentPlayer: Player
-    userColor: Player | null
+    userColor: Maybe<Player>
     selectedPosition: Position | null
     selectedHandPiece: PieceType | null
 }

@@ -3,11 +3,12 @@
 import {useCallback, useMemo} from 'react'
 import {Position, GameBoard, Player} from '@/types/game'
 import BoardSquare from "@/components/BoardSquare";
+import {Maybe} from "@/types/type-constructor";
 
 interface GameBoardProps {
     board: GameBoard
     currentPlayer: Player
-    userColor: Player | null
+    userColor: Maybe<Player>
 }
 
 const GameBoardComponent = ({ board, userColor }: GameBoardProps) => {

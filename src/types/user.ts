@@ -29,8 +29,6 @@ type UserModel = {
     username: string;
 }
 
-type MaybeUserModel = UserModel | null;
-
 export type {
     TUserSignUpPayload,
     TUserSignUpResponse,
@@ -38,5 +36,4 @@ export type {
     TUserPaginatedSearchPayload,
     TUserPaginatedSearchResponse,
     UserModel,
-    MaybeUserModel
 }

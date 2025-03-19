@@ -4,13 +4,14 @@ import React from 'react';
 import GameBoardComponent from '@/components/GameBoardComponent';
 import HandBoard from '@/components/HandBoard';
 import {GameBoard, Player} from '@/types/game';
+import { Maybe } from "@/types/type-constructor";
 
 interface MainGameContentProps {
     board: GameBoard;
     opponentHand: any[];
     playerHand: any[];
     currentPlayer: Player;
-    userColor: Player | null;
+    userColor: Maybe<Player>;
 }
 
 export default function MainGameContent({ board, opponentHand, playerHand, currentPlayer, userColor }: MainGameContentProps) {

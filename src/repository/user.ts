@@ -4,8 +4,11 @@ import {
     TUserPaginatedSearchResponse,
     TUserPaginatedSearchPayload,
     TUserSignUpPayload,
-    TUserSignUpResponse, MaybeUserModel, TUserGetByIdPayload
+    TUserSignUpResponse,
+    TUserGetByIdPayload
 } from "@/types/user";
+import {Maybe} from "@/types/type-constructor";
+import {UserModel} from "@/types/user";
 export class UserRepository {
     static async signUp(signUpPayload: TUserSignUpPayload): Promise<TUserSignUpResponse> {
         const { data } = await axios.post<TUserSignUpResponse>(`${apiEndpoints.user.signUp}`, signUpPayload);
@@ -23,8 +26,8 @@ export class UserRepository {
         return data;
     }
 
-    static async getById(payload: TUserGetByIdPayload): Promise<MaybeUserModel> {
-        const { data } = await axios.get<MaybeUserModel>(`${apiEndpoints.user.getById}/${payload.userId}`);
+    static async getById(payload: TUserGetByIdPayload): Promise<Maybe<UserModel>> {
+        const { data } = await axios.get<Maybe<UserModel>>(`${apiEndpoints.user.getById(payload.userId)}`);
         return data;
     }
 }
