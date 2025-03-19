@@ -82,6 +82,7 @@ export function GameProvider({ children }: GameProviderProps) {
                 socket.onmessage = (msg) => {
                     try {
                         const data: GameActionEvent = JSON.parse(msg.data);
+                        console.log("GameActionEvent Received:", data)
                         switch (data.type) {
                             case "BoardConfiguration":
                                 setBoardConfig(data.event);
@@ -90,6 +91,7 @@ export function GameProvider({ children }: GameProviderProps) {
                                 setAction(data.event);
                                 break;
                             case "InvalidGameAction":
+                                console.log("ERROR", data.event)
                                 setError(data.event);
                                 break;
                         }

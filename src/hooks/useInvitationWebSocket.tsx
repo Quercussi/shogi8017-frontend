@@ -40,6 +40,8 @@ export function useInvitationWebSocket(): UseInvitationWebSocketProps {
 
         const connectWebSocket = async () => {
             try {
+                    console.log("Connecting to invitation websocket");
+
                 const result = await getWebSocketToken();
                 if (!result.success) {
                     throw new Error(`Failed to get WebSocket token: ${result.error}`);
@@ -70,6 +72,9 @@ export function useInvitationWebSocket(): UseInvitationWebSocketProps {
                 };
 
                 socket.onclose = () => {
+                    console.log("Disconnecting invitation websocket");
+                    console.log("Retry count:", retryCount);
+
                     retryTimeout = setTimeout(
                         () => setRetryCount(prev => prev + 1),
                         Math.min(1000 * 2 ** retryCount, 10000)

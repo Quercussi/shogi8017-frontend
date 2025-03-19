@@ -2,42 +2,55 @@
 
 import { useDrag } from 'react-dnd'
 import { ShogiPiece } from './ShogiPiece'
-import {GamePiece, Owner} from "@/types/game"
-import {DragItemHand, DragItemType} from "@/app/game/[gameCertificate]/utils/drags";
-import {useRef} from "react";
+import { GamePiece } from "@/types/game"
+import { DragItemHand, DragItemType } from "@/app/game/[gameCertificate]/utils/drags"
+import { useRef } from "react"
 
 interface HandPieceProps {
     piece: GamePiece
+    viewOnly?: boolean
 }
 
-export const HandPiece = ({ piece }: HandPieceProps) => {
+function StaticHandPiece({ piece }: Omit<HandPieceProps, 'viewOnly'>) {
+    return (
+        <div className="w-12 h-12 cursor-default">
+            <ShogiPiece userColor={piece.owner} piece={piece} className="w-full h-full" />
+        </div>
+    )
+}
+
+function DraggableHandPiece({ piece }: Omit<HandPieceProps, 'viewOnly'>) {
     const pieceRef = useRef<HTMLDivElement>(null)
 
-    const [{ isDragging, canDrag }, drag] = useDrag(() => ({
+    const [{ isDragging }, drag] = useDrag(() => ({
         type: DragItemType.HAND_PIECE,
         item: {
             type: DragItemType.HAND_PIECE,
-            pieceType: piece.type
+            pieceType: piece.type,
         } as DragItemHand,
-        canDrag: piece.owner === Owner.PLAYER,
         collect: (monitor) => ({
             isDragging: monitor.isDragging(),
-            canDrag: monitor.canDrag()
         })
-    }))
+    }), [piece])
 
     drag(pieceRef)
 
     return (
         <div
             ref={pieceRef}
-            className={`h-12 w-12 border rounded ${
-                isDragging
-                    ? 'opacity-50 cursor-move'
-                    : (canDrag ? 'cursor-pointer' : 'cursor-default')
-            }`}
+            className={`w-12 h-12 ${isDragging ? 'opacity-50' : ''} cursor-grab`}
         >
-            <ShogiPiece piece={piece} className="w-8 h-8" />
+            <ShogiPiece userColor={piece.owner} piece={piece} className="w-full h-full" />
         </div>
     )
+}
+
+export const HandPiece = (props: HandPieceProps) => {
+    const { viewOnly = false, piece } = props
+
+    if (viewOnly) {
+        return <StaticHandPiece piece={piece} />
+    }
+
+    return <DraggableHandPiece piece={piece} />
 }

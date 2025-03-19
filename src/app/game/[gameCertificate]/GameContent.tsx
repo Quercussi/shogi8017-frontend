@@ -1,24 +1,24 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
-import { StateTransition } from '@/types/ws-game';
 import {
-    BoardActionEnumerators,
     GameBoard,
-    GameEventWinnerPairDeterminated,
     GameConfiguration,
-    Owner,
+    GameEventWinnerPairDeterminated,
     Player,
-    Position,
-    PieceType,
 } from '@/types/game';
 import { useGameContext } from '@/hooks/useGameWebSocket';
-import { opponentPlayer } from '@/app/game/[gameCertificate]/utils/calculations';
+import {
+    commitStateTransition,
+    createPiece,
+    opponentPlayer,
+    toBoardIndices
+} from '@/app/game/[gameCertificate]/utils/calculations';
 import GameOverOverlay from '@/components/GameOverOverlay';
 import Sidebar from '@/components/Sidebar';
 import MainGameContent from '@/components/MainGameContent';
+import { useSession } from "next-auth/react";
 
 const initialBoard: GameBoard = Array(9).fill(null).map(() => Array(9).fill(null));
 
@@ -27,8 +27,8 @@ export default function GameContent() {
     const { data: session } = useSession();
     const [gameState, setGameState] = useState<GameConfiguration>({
         board: initialBoard,
-        playerHand: [],
-        opponentHand: [],
+        whiteHand: [],
+        blackHand: [],
         currentPlayer: Player.BLACK_PLAYER,
         userColor: null,
         selectedPosition: null,
@@ -38,30 +38,19 @@ export default function GameContent() {
     const { requestAction, events, setGameCertificate } = useGameContext();
     const router = useRouter();
 
+    // Initialize game certificate
     useEffect(() => {
-        if (Array.isArray(gameCertificate)) {
-            setGameCertificate(gameCertificate[0]);
-        } else if (typeof gameCertificate === 'string') {
-            setGameCertificate(gameCertificate);
+        const cert = Array.isArray(gameCertificate) ? gameCertificate[0] : gameCertificate;
+        if (typeof cert === 'string') {
+            setGameCertificate(cert);
         }
     }, [gameCertificate, setGameCertificate]);
 
-    const toBoardIndices = useCallback((position: Position) => ({
-        row: 9 - position.y,
-        col: 9 - position.x,
-    }), []);
-
-    const createPiece = useCallback((pieceType: PieceType, player: Player, userColor: Player | null) => ({
-        type: pieceType,
-        owner: player === userColor ? Owner.PLAYER : Owner.OPPONENT,
-        ownerPlayer: player,
-    }), []);
-
+    // Handle board configuration updates
     useEffect(() => {
         if (!events.boardConfig) return;
 
-        const { playerList, board, handPieceCounts } = events.boardConfig;
-
+        const { playerList, board, handPieceCounts, currentPlayerTurn } = events.boardConfig;
         const userColor = playerList.whitePlayer.userId === session?.user?.userInfo.userId
             ? Player.WHITE_PLAYER : Player.BLACK_PLAYER;
 
@@ -69,7 +58,7 @@ export default function GameContent() {
         const newBoard = initialBoard.map(row => [...row]);
         board.forEach(({ position, piece, owner: player }) => {
             const { row, col } = toBoardIndices(position);
-            newBoard[row][col] = createPiece(piece, player, userColor);
+            newBoard[row][col] = createPiece(piece, player);
         });
 
         // Parse hand pieces
@@ -77,77 +66,37 @@ export default function GameContent() {
             .filter(hpc => hpc.player === player)
             .flatMap(hpc => Array(hpc.count).fill({
                 type: hpc.piece,
-                owner: player === userColor ? Owner.PLAYER : Owner.OPPONENT,
+                owner: player,
                 ownerPlayer: player,
             }));
 
         setGameState(prev => ({
             ...prev,
             board: newBoard,
-            playerHand: parseHand(userColor),
-            opponentHand: parseHand(opponentPlayer(userColor)),
-            currentPlayer: opponentPlayer(prev.currentPlayer),
+            whiteHand: parseHand(Player.WHITE_PLAYER),
+            blackHand: parseHand(Player.BLACK_PLAYER),
+            currentPlayer: currentPlayerTurn, // Use the current player from payload
             userColor,
         }));
+    }, [events.boardConfig, session?.user?.userInfo.userId]);
 
-    }, [events.boardConfig, session, toBoardIndices, createPiece]);
-
-    const processTransition = useCallback((transition: StateTransition) => {
-        const { boardAction, position, piece, player } = transition;
-        const { row, col } = toBoardIndices(position);
-
-        setGameState(prev => {
-            const isPlayerPiece = player === prev.userColor;
-            const ownerType = isPlayerPiece ? Owner.PLAYER : Owner.OPPONENT;
-            const hand = isPlayerPiece ? prev.playerHand : prev.opponentHand;
-
-            switch (boardAction) {
-                case BoardActionEnumerators.REMOVE: {
-                    const newBoard = [...prev.board];
-                    newBoard[row][col] = null;
-                    return { ...prev, board: newBoard };
-                }
-
-                case BoardActionEnumerators.ADD: {
-                    const newBoard = [...prev.board];
-                    newBoard[row][col] = createPiece(piece, player, prev.userColor);
-                    return { ...prev, board: newBoard };
-                }
-
-                case BoardActionEnumerators.HAND_ADD: {
-                    const newPiece = createPiece(piece, player, prev.userColor);
-                    return isPlayerPiece
-                        ? { ...prev, playerHand: [...prev.playerHand, newPiece] }
-                        : { ...prev, opponentHand: [...prev.opponentHand, newPiece] };
-                }
-
-                case BoardActionEnumerators.HAND_REMOVE: {
-                    const index = hand.findIndex(p => p.type === piece);
-                    if (index === -1) return prev;
-
-                    const newHand = [...hand.slice(0, index), ...hand.slice(index + 1)];
-                    return isPlayerPiece
-                        ? { ...prev, playerHand: newHand }
-                        : { ...prev, opponentHand: newHand };
-                }
-
-                default:
-                    return prev;
-            }
-        });
-    }, [toBoardIndices, createPiece]);
-
+    // Handle game actions
     useEffect(() => {
         if (!events.action) return;
 
         const { stateTransitionList, gameEvent } = events.action;
 
-        stateTransitionList.forEach(processTransition);
+        setGameState(prevState => {
+            const updatedState = stateTransitionList.reduce(
+                (state, transition) => commitStateTransition(state, transition),
+                prevState
+            );
 
-        setGameState(prev => ({
-            ...prev,
-            currentPlayer: prev.currentPlayer === Player.WHITE_PLAYER  ? Player.BLACK_PLAYER : Player.WHITE_PLAYER,
-        }));
+            return {
+                ...updatedState,
+                currentPlayer: opponentPlayer(updatedState.currentPlayer),
+            };
+        });
 
         if (gameEvent.winner) {
             setGameOutcome({
@@ -155,11 +104,15 @@ export default function GameContent() {
                 winner: gameEvent.winner,
             });
         }
-    }, [events.action, processTransition]);
+    }, [events.action]);
 
     const getDisplayColor = (player: Player) => player === Player.WHITE_PLAYER ? "White" : "Black";
     const userColorDisplay = gameState.userColor ? getDisplayColor(gameState.userColor) : "";
     const currentTurnDisplay = getDisplayColor(gameState.currentPlayer);
+
+    const [playerHand, opponentHand] = gameState.userColor === Player.WHITE_PLAYER
+        ? [gameState.whiteHand, gameState.blackHand]
+        : [gameState.blackHand, gameState.whiteHand];
 
     return (
         <div className="h-screen flex">
@@ -167,11 +120,13 @@ export default function GameContent() {
                 userColor={userColorDisplay}
                 currentTurn={currentTurnDisplay}
                 onResign={() => requestAction.resign({})}
+                gameOutcome={gameOutcome}
+                onReturnHome={() => router.push("/")}
             />
             <MainGameContent
                 board={gameState.board}
-                opponentHand={gameState.opponentHand}
-                playerHand={gameState.playerHand}
+                opponentHand={opponentHand}
+                playerHand={playerHand}
                 currentPlayer={gameState.currentPlayer}
                 userColor={gameState.userColor}
             />

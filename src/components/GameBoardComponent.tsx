@@ -9,9 +9,10 @@ interface GameBoardProps {
     board: GameBoard
     currentPlayer: Player
     userColor: Maybe<Player>
+    viewOnly?: boolean
 }
 
-const GameBoardComponent = ({ board, userColor }: GameBoardProps) => {
+const GameBoardComponent = ({ board, userColor, viewOnly = false }: GameBoardProps) => {
     const renderSquare = useCallback((x: number, y: number) => {
         const position: Position = { x, y }
         const row = 9 - y
@@ -23,9 +24,11 @@ const GameBoardComponent = ({ board, userColor }: GameBoardProps) => {
                 key={`${x}-${y}`}
                 position={position}
                 piece={piece}
+                userColor={userColor}
+                viewOnly={viewOnly}
             />
         )
-    }, [board])
+    }, [board, userColor, viewOnly])
 
     const squares = useMemo(() => {
         const baseSquares = Array.from({ length: 9 })

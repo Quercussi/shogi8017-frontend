@@ -1,15 +1,4 @@
-import {UserModel} from "@/types/user";
-import {
-    BoardActionEnumerators,
-    DropAction,
-    GameEvent,
-    GameWinner,
-    MoveAction,
-    PieceType,
-    Player,
-    Position
-} from "@/types/game";
-
+import * as GameTypes from "@/types/game";
 
 type GameActionRequest =
     | MakeMoveRequest
@@ -25,48 +14,18 @@ type GameActionEvent =
 type BoardConfigurationEvent  = BaseWebSocketEvent<'BoardConfiguration', BoardConfigurationEventPayload>
 
 type BoardConfigurationEventPayload = {
-    playerList: PlayerList,
-    board: PositionPiecePair[],
-    handPieceCounts: HandPieceCount[]
+    playerList: GameTypes.PlayerList,
+    board: GameTypes.PositionPiecePair[],
+    handPieceCounts: GameTypes.HandPieceCount[],
+    currentPlayerTurn: GameTypes.Player,
 }
-
-type PlayerList = {
-    whitePlayer: UserModel
-    blackPlayer: UserModel
-}
-
-type PositionPiecePair = {
-    position: Position,
-    piece: PieceType,
-    owner: Player,
-}
-
-type HandPieceCount = {
-    player: Player,
-    piece: PieceType,
-    count: number
-}
-
 
 type ExecutionActionEvent = BaseWebSocketEvent<'ExecutionAction', ExecutionActionEventPayload>
 
 type ExecutionActionEventPayload = {
-    stateTransitionList: StateTransition[],
-    gameEvent: GameEventWinnerPair,
+    stateTransitionList: GameTypes.StateTransition[],
+    gameEvent: GameTypes.GameEventWinnerPair,
 }
-
-type StateTransition = {
-    boardAction: BoardActionEnumerators,
-    position: Position,
-    player: Player,
-    piece: PieceType
-}
-
-type GameEventWinnerPair = {
-    gameEvent?: GameEvent,
-    winner?: GameWinner
-}
-
 
 type InvalidGameActionEvent = BaseWebSocketEvent<'InvalidGameAction', InvalidGameActionPayload>
 
@@ -78,14 +37,14 @@ type InvalidGameActionPayload = {
 type MakeMoveRequest = BaseWebSocketRequest<'makeMove', MakeMoveRequestPayload>
 
 type MakeMoveRequestPayload = {
-    move: MoveAction
+    move: GameTypes.MoveAction
 }
 
 
 type MakeDropRequest = BaseWebSocketRequest<'makeDrop', MakeDropRequestPayload>
 
 type MakeDropRequestPayload = {
-    drop: DropAction
+    drop: GameTypes.DropAction
 }
 
 
@@ -95,8 +54,6 @@ type ResignRequestPayload = {}
 
 
 export type {
-    StateTransition,
-
     GameActionRequest,
     MakeMoveRequest,
     MakeDropRequest,

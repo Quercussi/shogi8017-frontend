@@ -12,7 +12,9 @@ const apiEndpoints = {
         getById: (userId: string) => `${root}/user/${userId}`,
     },
     game: {
-        paginatedGet: `${root}/game`
+        paginatedGet: `${root}/game`,
+        paginatedGetHistory: (gameCertificate:string) =>  `${root}/game/${gameCertificate}/history`,
+        getDefaultConfiguration: `${root}/game/defaultConfiguration`,
     }
 }
 

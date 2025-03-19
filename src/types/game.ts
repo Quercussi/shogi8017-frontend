@@ -6,11 +6,59 @@ type TGamePaginatedGetPayload = {
     limit?: number
 }
 
+type TGameHistoryPaginatedPayload = {
+    gameCertificate: string
+    offset?: number
+    limit?: number
+}
+
+type TGameHistoryPaginatedResponse = {
+    executionHistories: MoveResultReduced[],
+    count: number,
+    nextOffset: number,
+    total: number
+}
+
 type TGamePaginatedGetResponse = {
     games: GameModel[],
     count: number,
     nextOffset: number,
     total: number
+}
+
+type PlayerList = {
+    whitePlayer: UserModel
+    blackPlayer: UserModel
+}
+
+type PositionPiecePair = {
+    position: Position,
+    piece: PieceType,
+    owner: Player,
+}
+
+type HandPieceCount = {
+    player: Player,
+    piece: PieceType,
+    count: number
+}
+
+type StateTransition = {
+    boardAction: BoardActionEnumerators,
+    position: Position,
+    player: Player,
+    piece: PieceType
+}
+
+type GameEventWinnerPair = {
+    gameEvent?: GameEvent,
+    winner?: GameWinner
+}
+
+type BoardConfiguration = {
+    board: PositionPiecePair[],
+    handPieceCounts: HandPieceCount[],
+    currentPlayerTurn: Player
 }
 
 type GameModel = {
@@ -100,8 +148,7 @@ enum GameState {
 
 type GamePiece = {
     type: PieceType
-    owner: Owner
-    ownerPlayer: Player
+    owner: Player
 }
 
 enum Owner {
@@ -115,8 +162,8 @@ type GameHand = GamePiece[]
 
 type GameConfiguration = {
     board: GameBoard
-    playerHand: GameHand
-    opponentHand: GameHand
+    whiteHand: GameHand
+    blackHand: GameHand
     currentPlayer: Player
     userColor: Maybe<Player>
     selectedPosition: Position | null
@@ -128,10 +175,28 @@ type GameEventWinnerPairDeterminated = {
     winner: GameWinner
 }
 
+type AlgebraicNotation = string
+
+type MoveResultReduced = {
+    player: Player,
+    stateTransitionList: StateTransition[],
+    algebraicNotation: AlgebraicNotation,
+    gameEventWinnerPair: GameEventWinnerPair
+}
+
 export type {
     TGamePaginatedGetPayload,
     TGamePaginatedGetResponse,
+    TGameHistoryPaginatedPayload,
+    TGameHistoryPaginatedResponse,
 
+    MoveResultReduced,
+    PlayerList,
+    PositionPiecePair,
+    HandPieceCount,
+    StateTransition,
+    GameEventWinnerPair,
+    BoardConfiguration,
     GameModel,
     Position,
     MoveAction,
